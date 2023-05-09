@@ -1,10 +1,10 @@
 import { expect } from "chai";
 import { Card } from "../src/card";
 import {
-  SingleCompareCardStrategy,
-  PairCompareCardStrategy,
-  StraightCompareCardStrategy,
-  FullHouseCompareCardStrategy,
+  SinglCardPatternStrategy,
+  PairCardPatternStrategy,
+  StraightCardPatternStrategy,
+  FullHousePatternStrategy,
 } from "../src/compare_card_strategy";
 
 import {
@@ -14,9 +14,9 @@ import {
   CheckFullHouseCardPatternHandler,
 } from "../src/ckeck_card_pattern_handler";
 
-describe("test SingleCompareCardStrategy", () => {
+describe("test SinglCardPatternStrategy", () => {
   it("basic", () => {
-    const strategy = new SingleCompareCardStrategy();
+    const strategy = new SinglCardPatternStrategy();
 
     expect(
       strategy.checkCardPatternHandler instanceof CheckSingleCardPatternHandler
@@ -26,7 +26,7 @@ describe("test SingleCompareCardStrategy", () => {
   });
 
   it("findTheBigCard", () => {
-    const strategy = new SingleCompareCardStrategy();
+    const strategy = new SinglCardPatternStrategy();
     const card = new Card("D", "3");
 
     // @ts-ignore
@@ -35,18 +35,42 @@ describe("test SingleCompareCardStrategy", () => {
   });
 
   it("checkCardsBigThanTopPlay", () => {
-    const strategy = new SingleCompareCardStrategy();
+    const strategy = new SinglCardPatternStrategy();
     const card = new Card("D", "3");
     const top_card = new Card("D", "9");
 
     const result = strategy.checkCardsBigThanTopPlay([card], [top_card]);
     expect(result).to.be.false;
   });
+
+  it("AIPlayCard: pass", () => {
+    const strategy = new SinglCardPatternStrategy();
+    const hand_card = [
+      new Card("D", "3"),
+      new Card("H", "4"),
+      new Card("S", "8"),
+    ];
+    const top_play = [new Card("S", "2")];
+
+    const result = strategy.AIPlayCard(hand_card, top_play);
+    expect(result).to.be.empty;
+  });
+
+  it("AIPlayCard: play card", () => {
+    const strategy = new SinglCardPatternStrategy();
+    const target_card = new Card("H", "7");
+    const hand_card = [new Card("D", "3"), target_card, new Card("S", "8")];
+    const top_play = [new Card("S", "6")];
+
+    const result = strategy.AIPlayCard(hand_card, top_play);
+    expect(result.length).to.be.equal(1);
+    expect(result[0]).to.be.equal(target_card);
+  });
 });
 
-describe("test PairCompareCardStrategy", () => {
+describe("test PairCardPatternStrategy", () => {
   it("basic", () => {
-    const strategy = new PairCompareCardStrategy();
+    const strategy = new PairCardPatternStrategy();
 
     expect(
       strategy.checkCardPatternHandler instanceof CheckPairCardPatternHandler
@@ -55,7 +79,7 @@ describe("test PairCompareCardStrategy", () => {
   });
 
   it("findTheBigCard", () => {
-    const strategy = new PairCompareCardStrategy();
+    const strategy = new PairCardPatternStrategy();
     const card_1 = new Card("D", "6");
 
     const card_2 = new Card("H", "6");
@@ -65,18 +89,57 @@ describe("test PairCompareCardStrategy", () => {
   });
 
   it("checkCardsBigThanTopPlay", () => {
-    const strategy = new PairCompareCardStrategy();
+    const strategy = new PairCardPatternStrategy();
     const cards = [new Card("D", "8"), new Card("H", "8")];
     const top_play = [new Card("D", "7"), new Card("H", "7")];
 
     const result = strategy.checkCardsBigThanTopPlay(cards, top_play);
     expect(result).to.be.true;
   });
+
+  it("AIPlayCard: pass because of card amount", () => {
+    const strategy = new PairCardPatternStrategy();
+    const hand_card = [new Card("D", "8")];
+    const top_play = [new Card("C", "7"), new Card("S", "7")];
+
+    const result = strategy.AIPlayCard(hand_card, top_play);
+    expect(result).to.be.empty;
+  });
+
+  it("AIPlayCard: pass because of no suitable card", () => {
+    const strategy = new PairCardPatternStrategy();
+    const hand_card = [
+      new Card("D", "5"),
+      new Card("H", "5"),
+      new Card("C", "6"),
+    ];
+    const top_play = [new Card("S", "7"), new Card("C", "7")];
+
+    const result = strategy.AIPlayCard(hand_card, top_play);
+    expect(result).to.be.empty;
+  });
+
+  it("AIPlayCard: play card", () => {
+    const strategy = new PairCardPatternStrategy();
+    const target_card_1 = new Card("D", "5");
+    const target_card_2 = new Card("H", "5");
+    const hand_card = [
+      target_card_1,
+      target_card_2,
+      new Card("C", "6"),
+      new Card("S", "6"),
+    ];
+    const top_play = [new Card("C", "3"), new Card("S", "3")];
+
+    const result = strategy.AIPlayCard(hand_card, top_play);
+    expect(result.length).to.be.equal(2);
+    expect(result).to.be.eql([target_card_1, target_card_2]);
+  });
 });
 
-describe("test StraightCompareCardStrategy", () => {
+describe("test StraightCardPatternStrategy", () => {
   it("basic", () => {
-    const strategy = new StraightCompareCardStrategy();
+    const strategy = new StraightCardPatternStrategy();
 
     expect(
       strategy.checkCardPatternHandler instanceof
@@ -86,7 +149,7 @@ describe("test StraightCompareCardStrategy", () => {
   });
 
   it("findTheBigCard", () => {
-    const strategy = new StraightCompareCardStrategy();
+    const strategy = new StraightCardPatternStrategy();
     const big_card = new Card("D", "10");
 
     // @ts-ignore
@@ -101,7 +164,7 @@ describe("test StraightCompareCardStrategy", () => {
   });
 
   it("checkCardsBigThanTopPlay", () => {
-    const strategy = new StraightCompareCardStrategy();
+    const strategy = new StraightCardPatternStrategy();
     const cards = [
       new Card("C", "3"),
       new Card("H", "4"),
@@ -120,11 +183,88 @@ describe("test StraightCompareCardStrategy", () => {
     const result = strategy.checkCardsBigThanTopPlay(cards, top_play);
     expect(result).to.be.true;
   });
+
+  it("AIPlayCard: pass because of card amount", () => {
+    const strategy = new StraightCardPatternStrategy();
+    const hand_card = [new Card("D", "8")];
+    const top_play = [
+      new Card("C", "7"),
+      new Card("S", "8"),
+      new Card("C", "9"),
+      new Card("S", "10"),
+      new Card("C", "J"),
+    ];
+
+    const result = strategy.AIPlayCard(hand_card, top_play);
+    expect(result).to.be.empty;
+  });
+
+  it("AIPlayCard: pass because of no suitable card", () => {
+    const strategy = new StraightCardPatternStrategy();
+    const hand_card = [
+      new Card("C", "3"),
+      new Card("S", "3"),
+      new Card("C", "4"),
+      new Card("S", "5"),
+      new Card("C", "6"),
+      new Card("S", "7"),
+      new Card("C", "J"),
+      new Card("S", "Q"),
+      new Card("C", "K"),
+    ];
+    const top_play = [
+      new Card("C", "7"),
+      new Card("S", "8"),
+      new Card("C", "9"),
+      new Card("S", "10"),
+      new Card("C", "J"),
+    ];
+
+    const result = strategy.AIPlayCard(hand_card, top_play);
+    expect(result).to.be.empty;
+  });
+
+  it("AIPlayCard: play card", () => {
+    const strategy = new StraightCardPatternStrategy();
+    const target_card_1 = new Card("C", "9");
+    const target_card_2 = new Card("S", "10");
+    const target_card_3 = new Card("C", "J");
+    const target_card_4 = new Card("S", "Q");
+    const target_card_5 = new Card("S", "K");
+    const hand_card = [
+      new Card("C", "5"),
+      new Card("S", "6"),
+      new Card("C", "7"),
+      new Card("S", "8"),
+      target_card_1,
+      target_card_2,
+      target_card_3,
+      target_card_4,
+      target_card_5,
+    ];
+    const top_play = [
+      new Card("C", "7"),
+      new Card("S", "8"),
+      new Card("C", "9"),
+      new Card("S", "10"),
+      new Card("C", "J"),
+    ];
+
+    const result = strategy.AIPlayCard(hand_card, top_play);
+    expect(result.length).to.be.equal(5);
+    expect(result).to.be.eql([
+      target_card_5,
+      target_card_4,
+      target_card_3,
+      target_card_2,
+      target_card_1,
+    ]);
+  });
 });
 
-describe("test FullHouseCompareCardStrategy", () => {
+describe("test FullHousePatternStrategy", () => {
   it("basic", () => {
-    const strategy = new FullHouseCompareCardStrategy();
+    const strategy = new FullHousePatternStrategy();
 
     expect(
       strategy.checkCardPatternHandler instanceof
@@ -134,7 +274,7 @@ describe("test FullHouseCompareCardStrategy", () => {
   });
 
   it("findTheBigCard", () => {
-    const strategy = new FullHouseCompareCardStrategy();
+    const strategy = new FullHousePatternStrategy();
     const big_card = new Card("S", "10");
 
     // @ts-ignore
@@ -149,7 +289,7 @@ describe("test FullHouseCompareCardStrategy", () => {
   });
 
   it("checkCardsBigThanTopPlay", () => {
-    const strategy = new FullHouseCompareCardStrategy();
+    const strategy = new FullHousePatternStrategy();
     const cards = [
       new Card("C", "3"),
       new Card("H", "3"),
@@ -167,5 +307,80 @@ describe("test FullHouseCompareCardStrategy", () => {
 
     const result = strategy.checkCardsBigThanTopPlay(cards, top_play);
     expect(result).to.be.true;
+  });
+
+  it("AIPlayCard: pass because of card amount", () => {
+    const strategy = new FullHousePatternStrategy();
+    const hand_card = [new Card("D", "8")];
+    const top_play = [
+      new Card("C", "Q"),
+      new Card("S", "Q"),
+      new Card("C", "3"),
+      new Card("H", "3"),
+      new Card("S", "3"),
+    ];
+
+    const result = strategy.AIPlayCard(hand_card, top_play);
+    expect(result).to.be.empty;
+  });
+
+  it("AIPlayCard: pass because of no suitable card", () => {
+    const strategy = new FullHousePatternStrategy();
+    const hand_card = [
+      new Card("C", "10"),
+      new Card("H", "10"),
+      new Card("S", "10"),
+      new Card("C", "A"),
+      new Card("S", "A"),
+    ];
+    const top_play = [
+      new Card("C", "Q"),
+      new Card("S", "Q"),
+      new Card("C", "K"),
+      new Card("H", "K"),
+      new Card("S", "K"),
+    ];
+
+    const result = strategy.AIPlayCard(hand_card, top_play);
+    expect(result).to.be.empty;
+  });
+
+  it("AIPlayCard: play card", () => {
+    const strategy = new FullHousePatternStrategy();
+    const target_card_1 = new Card("C", "10");
+    const target_card_2 = new Card("H", "10");
+    const target_card_3 = new Card("C", "2");
+    const target_card_4 = new Card("H", "2");
+    const target_card_5 = new Card("S", "2");
+
+    const hand_card = [
+      target_card_1,
+      target_card_2,
+      new Card("C", "11"),
+      new Card("S", "11"),
+      new Card("C", "K"),
+      new Card("D", "K"),
+      new Card("H", "K"),
+      target_card_3,
+      target_card_4,
+      target_card_5,
+    ];
+    const top_play = [
+      new Card("C", "Q"),
+      new Card("S", "Q"),
+      new Card("C", "K"),
+      new Card("H", "K"),
+      new Card("S", "K"),
+    ];
+
+    const result = strategy.AIPlayCard(hand_card, top_play);
+    expect(result.length).to.be.equal(5);
+    expect(result).to.be.eql([
+      target_card_3,
+      target_card_4,
+      target_card_5,
+      target_card_1,
+      target_card_2,
+    ]);
   });
 });

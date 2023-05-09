@@ -9,10 +9,10 @@ import {
 } from "../src/ckeck_card_pattern_handler";
 
 import {
-  SingleCompareCardStrategy,
-  PairCompareCardStrategy,
-  StraightCompareCardStrategy,
-  FullHouseCompareCardStrategy,
+  SinglCardPatternStrategy,
+  PairCardPatternStrategy,
+  StraightCardPatternStrategy,
+  FullHousePatternStrategy,
 } from "../src/compare_card_strategy";
 
 describe("test CheckSingleCardPatternHandler", () => {
@@ -40,7 +40,7 @@ describe("test CheckSingleCardPatternHandler", () => {
 
     handler.checkTopPlayCardPatternAndSetGameCompareStrategy(cards, game);
 
-    expect(game.compareCardStrategy instanceof SingleCompareCardStrategy).to.be
+    expect(game.compareCardStrategy instanceof SinglCardPatternStrategy).to.be
       .true;
   });
 });
@@ -79,7 +79,7 @@ describe("test CheckPairCardPatternHandler", () => {
 
     handler.checkTopPlayCardPatternAndSetGameCompareStrategy(cards, game);
 
-    expect(game.compareCardStrategy instanceof PairCompareCardStrategy).to.be
+    expect(game.compareCardStrategy instanceof PairCardPatternStrategy).to.be
       .true;
   });
 });
@@ -134,7 +134,7 @@ describe("test CheckStraightCardPatternHandler", () => {
 
     handler.checkTopPlayCardPatternAndSetGameCompareStrategy(cards, game);
 
-    expect(game.compareCardStrategy instanceof StraightCompareCardStrategy).to
+    expect(game.compareCardStrategy instanceof StraightCardPatternStrategy).to
       .be.true;
   });
 });
@@ -189,7 +189,7 @@ describe("test CheckFullHouseCardPatternHandler", () => {
 
     handler.checkTopPlayCardPatternAndSetGameCompareStrategy(cards, game);
 
-    expect(game.compareCardStrategy instanceof FullHouseCompareCardStrategy).to
-      .be.true;
+    expect(game.compareCardStrategy instanceof FullHousePatternStrategy).to.be
+      .true;
   });
 });

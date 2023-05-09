@@ -1,7 +1,9 @@
 import { Player, Hand, AIPlayer, HumanPlayer } from "../src/player";
 import { Card } from "../src/card";
+import { Game } from "../src/game";
 import { expect } from "chai";
 import commandLine from "../src/command_line";
+import { SinglCardPatternStrategy } from "../src/compare_card_strategy";
 import sinon, { SinonMock } from "sinon";
 const sandbox = sinon.createSandbox();
 
@@ -71,11 +73,39 @@ describe("test AI player", () => {
 
   it("name self", () => {
     const spy = sandbox.spy(console, "log");
-    const AI_player = new AIPlayer();
+    const game = new Game();
+    const AI_player = new AIPlayer(game);
     AI_player.nameSelf();
 
     expect(AI_player.name.includes("AI")).to.be.true;
     expect(spy.withArgs(AI_player.name).calledOnce).to.be.true;
+  });
+
+  it("play: is top player", async () => {
+    const game = new Game();
+    const player = new AIPlayer(game);
+    const card = new Card("D", "5");
+    player.addHandCard(card);
+    player.addHandCard(new Card("H", "K"));
+
+    const result = await player.play();
+    expect(result).to.be.eql([card]);
+  });
+
+  it("play: is not top player", async () => {
+    const game = new Game();
+    // @ts-ignore
+    game.topPlayer = new HumanPlayer();
+    game.topPlay = [new Card("C", "7")];
+    game.compareCardStrategy = new SinglCardPatternStrategy();
+
+    const player = new AIPlayer(game);
+    const card = new Card("H", "K");
+    player.addHandCard(new Card("D", "5"));
+    player.addHandCard(card);
+
+    const result = await player.play();
+    expect(result).to.be.eql([card]);
   });
 });
 

@@ -1,6 +1,6 @@
 import { Card, Deck } from "./card";
 import { Player } from "./player";
-import { CardCompareStrategy } from "./compare_card_strategy";
+import { CardPatternStrategy } from "./compare_card_strategy";
 import {
   CheckCardPatternHandler,
   CheckSingleCardPatternHandler,
@@ -11,7 +11,7 @@ export class Game {
   private _topPlay: Card[] = [];
   private topPlayer: Player | null = null;
   private playerList: Player[] = [];
-  private _compareCardStrategy: CardCompareStrategy | null = null;
+  private _compareCardStrategy: CardPatternStrategy | null = null;
   private checkCardPatternHandler: CheckCardPatternHandler;
   private finishFristRound: boolean = false;
   private gameEnd: boolean = false;
@@ -33,6 +33,10 @@ export class Game {
   }
 
   public async start() {
+    if (this.playerList.length < 2) {
+      throw Error("play Big 2 game at least have 2 player");
+    }
+
     await this.gameStartPrepare();
 
     while (!this.gameEnd) {
@@ -72,8 +76,12 @@ export class Game {
 
     let nextPlayerIndex = this.playerList.indexOf(this.topPlayer) + 1;
 
-    while (this.playerList[nextPlayerIndex % 4] !== this.topPlayer) {
-      const now_player = this.playerList[nextPlayerIndex % 4];
+    while (
+      this.playerList[nextPlayerIndex % this.playerList.length] !==
+      this.topPlayer
+    ) {
+      const now_player =
+        this.playerList[nextPlayerIndex % this.playerList.length];
       now_player.hand.showHandCard();
       await this.normalPlayerTurn(now_player);
       if (this.checkGameEnd(now_player)) return;
@@ -90,7 +98,13 @@ export class Game {
         (card) => card.suit === "C" && card.rank === "3"
       );
 
-      if (result) return this.playerList[i];
+      if (result) {
+        if (this.deck.cardList.length > 0) {
+          this.playerList[i].addHandCard(this.deck.deal());
+          this.playerList[i].sortHandCard();
+        }
+        return this.playerList[i];
+      }
     }
   }
 
@@ -101,7 +115,7 @@ export class Game {
       console.log("你不能在新的回合中喊 PASS");
       return await this.topPlayerTurn();
     }
-
+    // FIXME: 3位玩家玩牌的情形
     if (!this.finishFristRound) {
       const have_club_3 = play_cards.some(
         (card) => card.rank === "3" && card.suit === "C"
@@ -168,7 +182,7 @@ export class Game {
     return;
   }
 
-  set compareCardStrategy(compareCardStrategy: CardCompareStrategy) {
+  set compareCardStrategy(compareCardStrategy: CardPatternStrategy) {
     this._compareCardStrategy = compareCardStrategy;
   }
 

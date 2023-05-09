@@ -1,4 +1,5 @@
 import { Card } from "./card";
+import { Game } from "./game";
 import commandLine from "./command_line";
 
 export abstract class Player {
@@ -39,15 +40,28 @@ export abstract class Player {
 }
 
 export class AIPlayer extends Player {
+  private game: Game;
+
+  constructor(game: Game) {
+    super();
+    this.game = game;
+  }
+
   public async nameSelf() {
     this._name = `AI ${Math.floor(Math.random() * 1000)}`;
     console.log(this._name);
     return;
   }
 
-  //  FIXME: 還沒有實作，先隨便寫通過格式而已
   public async play() {
-    return this.hand.cardList;
+    if (this.game.topPlay.length === 0) {
+      return [this.hand.cardList[0]];
+    }
+
+    return this.game.compareCardStrategy.AIPlayCard(
+      this.hand.cardList,
+      this.game.topPlay
+    );
   }
 }
 

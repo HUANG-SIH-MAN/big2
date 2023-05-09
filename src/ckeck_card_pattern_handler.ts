@@ -1,10 +1,10 @@
 import { Game } from "./game";
 import { Card } from "./card";
 import {
-  SingleCompareCardStrategy,
-  PairCompareCardStrategy,
-  StraightCompareCardStrategy,
-  FullHouseCompareCardStrategy,
+  SinglCardPatternStrategy,
+  PairCardPatternStrategy,
+  StraightCardPatternStrategy,
+  FullHousePatternStrategy,
 } from "./compare_card_strategy";
 
 export abstract class CheckCardPatternHandler {
@@ -36,7 +36,7 @@ export class CheckSingleCardPatternHandler extends CheckCardPatternHandler {
   }
 
   protected setGameCompareCardStrategy(game: Game) {
-    game.compareCardStrategy = new SingleCompareCardStrategy();
+    game.compareCardStrategy = new SinglCardPatternStrategy();
   }
 }
 
@@ -48,7 +48,7 @@ export class CheckPairCardPatternHandler extends CheckCardPatternHandler {
   }
 
   protected setGameCompareCardStrategy(game: Game) {
-    game.compareCardStrategy = new PairCompareCardStrategy();
+    game.compareCardStrategy = new PairCardPatternStrategy();
   }
 }
 
@@ -60,19 +60,19 @@ export class CheckStraightCardPatternHandler extends CheckCardPatternHandler {
       return Card.compareFirstCardBigThenNext(a, b) ? 1 : -1;
     });
 
-    let previous_card_rank_index = Card.rank_enum.indexOf(sort_cards[0].rank);
+    let previous_card_rank_size = sort_cards[0].rankSize;
 
     for (let i = 1; i < cards.length; i++) {
-      const card_rank_index = Card.rank_enum.indexOf(sort_cards[i].rank);
-      if (card_rank_index !== previous_card_rank_index + 1) return false;
-      previous_card_rank_index = card_rank_index;
+      const card_rank_size = sort_cards[i].rankSize;
+      if (card_rank_size !== previous_card_rank_size + 1) return false;
+      previous_card_rank_size = card_rank_size;
     }
 
     return true;
   }
 
   protected setGameCompareCardStrategy(game: Game) {
-    game.compareCardStrategy = new StraightCompareCardStrategy();
+    game.compareCardStrategy = new StraightCardPatternStrategy();
   }
 }
 
@@ -101,6 +101,6 @@ export class CheckFullHouseCardPatternHandler extends CheckCardPatternHandler {
   }
 
   protected setGameCompareCardStrategy(game: Game) {
-    game.compareCardStrategy = new FullHouseCompareCardStrategy();
+    game.compareCardStrategy = new FullHousePatternStrategy();
   }
 }

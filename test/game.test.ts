@@ -3,7 +3,7 @@ import { Game } from "../src/game";
 import { AIPlayer, HumanPlayer } from "../src/player";
 import { Card, Deck } from "../src/card";
 import commandLine from "../src/command_line";
-import { SingleCompareCardStrategy } from "../src/compare_card_strategy";
+import { SinglCardPatternStrategy } from "../src/compare_card_strategy";
 import sinon, { SinonMock } from "sinon";
 const sandbox = sinon.createSandbox();
 
@@ -30,7 +30,7 @@ describe("test game", () => {
 
   it("add player", () => {
     const game = new Game();
-    const ai_player = new AIPlayer();
+    const ai_player = new AIPlayer(game);
     const human_player = new HumanPlayer();
     game.addPlayer([ai_player, human_player]);
 
@@ -42,13 +42,49 @@ describe("test game", () => {
     expect(game.playerList[1]).to.be.equal(human_player);
   });
 
+  it("add to much player", () => {
+    const game = new Game();
+
+    expect(() =>
+      game.addPlayer([
+        new HumanPlayer(),
+        new HumanPlayer(),
+        new HumanPlayer(),
+        new HumanPlayer(),
+        new HumanPlayer(),
+      ])
+    ).to.throw(Error, "Big 2 game can't have more than 4 player");
+  });
+
+  it("game start with 4 player", async () => {
+    const game = new Game();
+    game.addPlayer([new AIPlayer(game)]);
+
+    const error = await game.start().catch((err) => err);
+    expect(error).to.be.an("Error");
+    expect(error.message).to.equal("play Big 2 game at least have 2 player");
+  });
+
+  it("game start with 4 player", async () => {
+    const game = new Game();
+    game.addPlayer([
+      new AIPlayer(game),
+      new AIPlayer(game),
+      new AIPlayer(game),
+      new AIPlayer(game),
+    ]);
+
+    const error = await game.start().catch((err) => err);
+    expect(error).to.not.be.exist;
+  });
+
   it("game start prepare", async () => {
     const game = new Game();
     game.addPlayer([
-      new AIPlayer(),
-      new AIPlayer(),
-      new AIPlayer(),
-      new AIPlayer(),
+      new AIPlayer(game),
+      new AIPlayer(game),
+      new AIPlayer(game),
+      new AIPlayer(game),
     ]);
 
     const deck_spy = sandbox.spy(Deck.prototype, "shuffle");
@@ -73,10 +109,10 @@ describe("test game", () => {
 
   it("find first player", () => {
     const game = new Game();
-    const normal_player = new AIPlayer();
+    const normal_player = new AIPlayer(game);
     normal_player.addHandCard(new Card("C", "6"));
 
-    const target_player = new AIPlayer();
+    const target_player = new AIPlayer(game);
     target_player.addHandCard(new Card("C", "3"));
 
     game.addPlayer([normal_player, target_player]);
@@ -100,7 +136,7 @@ describe("test game", () => {
 
     mock.verify();
     expect(game.topPlay).to.be.eql([card]);
-    expect(game.compareCardStrategy instanceof SingleCompareCardStrategy).to.be
+    expect(game.compareCardStrategy instanceof SinglCardPatternStrategy).to.be
       .true;
     // @ts-ignore
     expect(game.finishFristRound).to.be.true;
@@ -211,7 +247,7 @@ describe("test game", () => {
   it("normal player turn: pass", async () => {
     const game = new Game();
     const player = new HumanPlayer();
-    const top_player = new AIPlayer();
+    const top_player = new AIPlayer(game);
     // @ts-ignore
     game.topPlayer = top_player;
     mock.expects("playingCards").withArgs().once().resolves("-1");
@@ -231,11 +267,11 @@ describe("test game", () => {
     const player = new HumanPlayer();
     player.addHandCard(new Card("D", "5"));
     player.addHandCard(new Card("H", "5"));
-    const top_player = new AIPlayer();
+    const top_player = new AIPlayer(game);
     // @ts-ignore
     game.topPlayer = top_player;
     game.topPlay = [new Card("D", "3")];
-    game.compareCardStrategy = new SingleCompareCardStrategy();
+    game.compareCardStrategy = new SinglCardPatternStrategy();
 
     let calltime = 0;
     sandbox.stub(commandLine, "playingCards").callsFake(async () => {
@@ -254,11 +290,11 @@ describe("test game", () => {
     const player = new HumanPlayer();
     player.addHandCard(new Card("D", "5"));
     player.addHandCard(new Card("H", "10"));
-    const top_player = new AIPlayer();
+    const top_player = new AIPlayer(game);
     // @ts-ignore
     game.topPlayer = top_player;
     game.topPlay = [new Card("D", "9")];
-    game.compareCardStrategy = new SingleCompareCardStrategy();
+    game.compareCardStrategy = new SinglCardPatternStrategy();
 
     let calltime = 0;
     sandbox.stub(commandLine, "playingCards").callsFake(async () => {
@@ -277,11 +313,11 @@ describe("test game", () => {
     const player = new HumanPlayer();
     const card = new Card("H", "10");
     player.addHandCard(card);
-    const top_player = new AIPlayer();
+    const top_player = new AIPlayer(game);
     // @ts-ignore
     game.topPlayer = top_player;
     game.topPlay = [new Card("D", "9")];
-    game.compareCardStrategy = new SingleCompareCardStrategy();
+    game.compareCardStrategy = new SinglCardPatternStrategy();
     mock.expects("playingCards").withArgs().once().resolves("0");
     const spy = sandbox.spy(console, "log");
 

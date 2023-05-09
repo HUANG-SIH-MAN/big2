@@ -53,18 +53,10 @@ export class Card {
   ];
 
   static compareFirstCardBigThenNext(first: Card, second: Card): boolean {
-    const first_rank_index = Card.rank_enum.indexOf(first.rank);
-    const second_rank_index = Card.rank_enum.indexOf(second.rank);
-
-    if (first_rank_index > second_rank_index) return true;
-    if (first_rank_index < second_rank_index) return false;
-
-    const first_suit_index = Card.suit_enum.indexOf(first.suit);
-    const second_suit_index = Card.suit_enum.indexOf(second.suit);
-
-    if (first_suit_index > second_suit_index) return true;
-    if (first_suit_index < second_suit_index) return false;
-
+    if (first.rankSize > second.rankSize) return true;
+    if (first.rankSize < second.rankSize) return false;
+    if (first.suitSize > second.suitSize) return true;
+    if (first.suitSize < second.suitSize) return false;
     return false;
   }
 
@@ -82,5 +74,13 @@ export class Card {
 
   get rank() {
     return this._rank;
+  }
+
+  get rankSize() {
+    return Card.rank_enum.indexOf(this._rank);
+  }
+
+  get suitSize() {
+    return Card.suit_enum.indexOf(this._suit);
   }
 }
