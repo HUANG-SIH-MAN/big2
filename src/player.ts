@@ -110,8 +110,10 @@ export class Hand {
     let card_word = "";
 
     this._cardList.forEach((card, index) => {
-      index_word += `${index}    `;
-      card_word += `${card.suit}[${card.rank}] `;
+      const word = `${card.suit}[${card.rank}] `;
+      const str_index = String(index);
+      index_word += str_index + " ".padEnd(word.length - str_index.length);
+      card_word += word;
     });
 
     console.log(index_word);

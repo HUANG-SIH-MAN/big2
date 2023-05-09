@@ -3,7 +3,7 @@ import { Card } from "../src/card";
 import { Game } from "../src/game";
 import { expect } from "chai";
 import commandLine from "../src/command_line";
-import { SinglCardPatternStrategy } from "../src/compare_card_strategy";
+import { SinglCardPatternStrategy } from "../src/card_pattern_strategy";
 import sinon, { SinonMock } from "sinon";
 const sandbox = sinon.createSandbox();
 
@@ -195,7 +195,7 @@ describe("test hand", () => {
     const spy = sandbox.spy(console, "log");
     hand.showHandCard();
 
-    expect(spy.withArgs("0    1    2    ").calledOnce).to.be.true;
+    expect(spy.withArgs("0    1    2     ").calledOnce).to.be.true;
     expect(spy.withArgs("D[4] S[6] H[10] ").calledOnce).to.be.true;
   });
 });

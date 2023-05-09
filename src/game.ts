@@ -1,6 +1,6 @@
 import { Card, Deck } from "./card";
 import { Player } from "./player";
-import { CardPatternStrategy } from "./compare_card_strategy";
+import { CardPatternStrategy } from "./card_pattern_strategy";
 import {
   CheckCardPatternHandler,
   CheckSingleCardPatternHandler,

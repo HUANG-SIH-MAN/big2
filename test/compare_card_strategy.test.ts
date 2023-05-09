@@ -5,24 +5,29 @@ import {
   PairCardPatternStrategy,
   StraightCardPatternStrategy,
   FullHousePatternStrategy,
-} from "../src/compare_card_strategy";
-
-import {
-  CheckSingleCardPatternHandler,
-  CheckPairCardPatternHandler,
-  CheckStraightCardPatternHandler,
-  CheckFullHouseCardPatternHandler,
-} from "../src/ckeck_card_pattern_handler";
+} from "../src/card_pattern_strategy";
 
 describe("test SinglCardPatternStrategy", () => {
   it("basic", () => {
     const strategy = new SinglCardPatternStrategy();
-
-    expect(
-      strategy.checkCardPatternHandler instanceof CheckSingleCardPatternHandler
-    ).to.be.true;
-
     expect(strategy.cardPatternName).to.be.equal("單張");
+  });
+
+  it("check card pattern, match", () => {
+    const strategy = new SinglCardPatternStrategy();
+    const card = new Card("D", "3");
+
+    const result = strategy.checkCardPattern([card]);
+    expect(result).to.be.true;
+  });
+
+  it("check card pattern, not match", () => {
+    const strategy = new SinglCardPatternStrategy();
+    const card_1 = new Card("D", "9");
+    const card_2 = new Card("D", "2");
+
+    const result = strategy.checkCardPattern([card_1, card_2]);
+    expect(result).to.be.false;
   });
 
   it("findTheBigCard", () => {
@@ -71,11 +76,33 @@ describe("test SinglCardPatternStrategy", () => {
 describe("test PairCardPatternStrategy", () => {
   it("basic", () => {
     const strategy = new PairCardPatternStrategy();
-
-    expect(
-      strategy.checkCardPatternHandler instanceof CheckPairCardPatternHandler
-    ).to.be.true;
     expect(strategy.cardPatternName).to.be.equal("對子");
+  });
+
+  it("check card pattern, match", () => {
+    const strategy = new PairCardPatternStrategy();
+    const card_1 = new Card("D", "9");
+    const card_2 = new Card("H", "9");
+
+    const result = strategy.checkCardPattern([card_1, card_2]);
+    expect(result).to.be.true;
+  });
+
+  it("check card pattern, card amount didn't match", () => {
+    const strategy = new PairCardPatternStrategy();
+    const card = new Card("D", "9");
+
+    const result = strategy.checkCardPattern([card]);
+    expect(result).to.be.false;
+  });
+
+  it("check card pattern, card rank didn't match", () => {
+    const strategy = new PairCardPatternStrategy();
+    const card_1 = new Card("D", "8");
+    const card_2 = new Card("D", "9");
+
+    const result = strategy.checkCardPattern([card_1, card_2]);
+    expect(result).to.be.false;
   });
 
   it("findTheBigCard", () => {
@@ -140,12 +167,43 @@ describe("test PairCardPatternStrategy", () => {
 describe("test StraightCardPatternStrategy", () => {
   it("basic", () => {
     const strategy = new StraightCardPatternStrategy();
-
-    expect(
-      strategy.checkCardPatternHandler instanceof
-        CheckStraightCardPatternHandler
-    ).to.be.true;
     expect(strategy.cardPatternName).to.be.equal("順子");
+  });
+
+  it("check card pattern, match", () => {
+    const strategy = new StraightCardPatternStrategy();
+    const cards = [
+      new Card("D", "3"),
+      new Card("D", "4"),
+      new Card("D", "5"),
+      new Card("D", "6"),
+      new Card("D", "7"),
+    ];
+
+    const result = strategy.checkCardPattern(cards);
+    expect(result).to.be.true;
+  });
+
+  it("check card pattern, card amount didn't match", () => {
+    const strategy = new StraightCardPatternStrategy();
+    const card = new Card("D", "9");
+
+    const result = strategy.checkCardPattern([card]);
+    expect(result).to.be.false;
+  });
+
+  it("check card pattern, card rank didn't match", () => {
+    const strategy = new StraightCardPatternStrategy();
+    const cards = [
+      new Card("D", "3"),
+      new Card("D", "8"),
+      new Card("D", "5"),
+      new Card("D", "6"),
+      new Card("D", "7"),
+    ];
+
+    const result = strategy.checkCardPattern(cards);
+    expect(result).to.be.false;
   });
 
   it("findTheBigCard", () => {
@@ -265,12 +323,43 @@ describe("test StraightCardPatternStrategy", () => {
 describe("test FullHousePatternStrategy", () => {
   it("basic", () => {
     const strategy = new FullHousePatternStrategy();
-
-    expect(
-      strategy.checkCardPatternHandler instanceof
-        CheckFullHouseCardPatternHandler
-    ).to.be.true;
     expect(strategy.cardPatternName).to.be.equal("葫蘆");
+  });
+
+  it("check card pattern, match", () => {
+    const strategy = new FullHousePatternStrategy();
+    const cards = [
+      new Card("D", "3"),
+      new Card("C", "3"),
+      new Card("H", "3"),
+      new Card("D", "6"),
+      new Card("S", "6"),
+    ];
+
+    const result = strategy.checkCardPattern(cards);
+    expect(result).to.be.true;
+  });
+
+  it("check card pattern, card amount didn't match", () => {
+    const strategy = new FullHousePatternStrategy();
+    const card = new Card("D", "9");
+
+    const result = strategy.checkCardPattern([card]);
+    expect(result).to.be.false;
+  });
+
+  it("check card pattern, card rank didn't match", () => {
+    const strategy = new FullHousePatternStrategy();
+    const cards = [
+      new Card("D", "3"),
+      new Card("H", "3"),
+      new Card("S", "6"),
+      new Card("D", "6"),
+      new Card("D", "7"),
+    ];
+
+    const result = strategy.checkCardPattern(cards);
+    expect(result).to.be.false;
   });
 
   it("findTheBigCard", () => {

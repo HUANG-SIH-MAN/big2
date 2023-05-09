@@ -3,7 +3,7 @@ import { Game } from "../src/game";
 import { AIPlayer, HumanPlayer } from "../src/player";
 import { Card, Deck } from "../src/card";
 import commandLine from "../src/command_line";
-import { SinglCardPatternStrategy } from "../src/compare_card_strategy";
+import { SinglCardPatternStrategy } from "../src/card_pattern_strategy";
 import sinon, { SinonMock } from "sinon";
 const sandbox = sinon.createSandbox();
 
